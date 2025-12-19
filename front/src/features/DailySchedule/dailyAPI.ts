@@ -2,8 +2,8 @@ import { MY_SERVER } from "../../env";
 import axios from "axios";
 import { Iflight } from "../../models/flight";
 
-export const getAllFlights = async (accessToken:string) => {
-  const res = await axios.get(`${MY_SERVER}flights/`,{
+export const getAllFlights = async (accessToken:string,date:string) => {
+  const res = await axios.get(`${MY_SERVER}flights/get/${date}`,{
     headers:{
       'Authorization': `Bearer ${accessToken}`
     }
@@ -23,7 +23,7 @@ export const getAllUsers = async () => {
 
 export const updateFlight = async (obj:{flight:Iflight,accessToken:string}) => {
   console.log(obj.flight)
-  const res = await axios.patch(`${MY_SERVER}flights/${obj.flight.id}`,obj.flight,{
+  const res = await axios.patch(`${MY_SERVER}flights/update/${obj.flight.id}`,obj.flight,{
     headers:{
       'Authorization': `Bearer ${obj.accessToken}`
     }

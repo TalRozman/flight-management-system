@@ -80,12 +80,12 @@ function App() {
         </Box>
       </Modal>
 
-      <nav className="navbar bg-dark" style={{ position: 'fixed', bottom: '0vw', width: '100%' }}>
+      <footer className="navbar bg-dark" style={{ position: 'fixed', bottom: '0vw', width: '100%' }}>
         <div className="container-fluid">
           <p style={{ color: 'white', verticalAlign: 'center' }}>Copyright &copy; {new Date().getFullYear()} Tal Rozman</p>
           <Link to={'/contact'} style={{ color: 'white', textDecoration: 'none' }}>Contact us</Link>
         </div>
-      </nav>
+      </footer>
     </div>
   );
 }

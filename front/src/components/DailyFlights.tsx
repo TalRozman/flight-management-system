@@ -9,14 +9,12 @@ import Timer from './Timer'
 const DailyFlights = () => {
   const dispatch = useAppDispatch()
   const flights = useAppSelector(selectFlights)
-  const [loading, setloading] = useState(true)
   const flightRefresh = useAppSelector(selectFlightsRefresh)
   const accessToken = String(sessionStorage.getItem('token'))
   let tokenDecode: any;
   const [displayType, settype] = useState<"arrivals" | "departures" | "all">("all")
   const [myDate, setmyDate] = useState<Date>(new Date())
   const [today, settoday] = useState("")
-  const [sorted, setsorted] = useState<Iflight[]>([...flights].sort((a, b) => +new Date(a.stdLocal) - +new Date(b.stdLocal)))
   const [moveDate, setmoveDate] = useState(false)
   const [Clicked, setClicked] = useState(false)
   const [currentFlight, setcurrentFlight] = useState<Iflight>()
@@ -28,25 +26,8 @@ const DailyFlights = () => {
   }
 
   useEffect(() => {
-    dispatch(getFlightsAsync(accessToken))
-      .then(() => {
-        const tempFlights = [...flights]
-        setsorted(tempFlights.sort((a, b) => +new Date(a.stdLocal) - +new Date(b.stdLocal)))
-      }).then(()=>setloading(false))
-    // eslint-disable-next-line
-  },[])
-
-  useEffect(() => {
-    dispatch(getFlightsAsync(accessToken))
-      .then(() => {
-        const tempFlights = [...flights]
-        setsorted(tempFlights.sort((a, b) => +new Date(a.stdLocal) - +new Date(b.stdLocal)))
-      }).then(()=>setloading(false))
-    // eslint-disable-next-line
-  }, [flightRefresh])
-
-  useEffect(() => {
-    settoday(myDate.toISOString().slice(0, 10))
+    dispatch(getFlightsAsync({ 'accessToken': accessToken, 'date': `${myDate.toLocaleDateString().slice(6)}-${myDate.toLocaleDateString().slice(0, 2)}-${myDate.toLocaleDateString().slice(3, 5)}` }))
+    settoday(`${myDate.toLocaleDateString().slice(3, 5)} / ${myDate.toLocaleDateString().slice(0, 2)} / ${myDate.toLocaleDateString().slice(6,)}`)
     // eslint-disable-next-line
   }, [moveDate])
 
@@ -72,21 +53,23 @@ const DailyFlights = () => {
 
   return (
     <div style={{ textAlign: 'center' }}>
-      {loading ?
+      <>
+        {tokenDecode?.type === "Manager" && <button className='btn btn-warning  ' onClick={() => dispatch(pullFlightsAsync())}>PULL FLIGHTS</button>}<br />
+        <button className='btn' onClick={() => settype('all')}>All flights</button>
+        <button className='btn' onClick={() => settype('departures')}>Departures only</button>
+        <button className='btn' onClick={() => settype('arrivals')}>Arrivals only</button>
+        <br />
+        <div>
+          <button className='btn' onClick={() => backDay()}> - </button>
+          <button className='btn' onClick={() => setToday()}>{today}</button>
+          <button className='btn' onClick={() => addDay()}> + </button>
+        </div>
+      </>
+      {flights.length === 0 ?
         <>
-          <img src='https://joyustrips.com/assets/images/FlightLoader.gif' width={'100%'} height={'100%'} style={{ position: 'absolute', top: '0px', right: '0px', bottom: '0px', left: '0px' }} alt="loaderGIF" />
+          <img src='/loader.gif' width={'30%'} style={{ marginTop: '10%' }} alt="loaderGIF" />
         </> :
         <>
-          {tokenDecode?.type === "Manager" && <button className='btn btn-warning  ' onClick={() => dispatch(pullFlightsAsync())}>PULL FLIGHTS</button>}<br />
-          <button className='btn' onClick={() => settype('all')}>All flights</button>
-          <button className='btn' onClick={() => settype('departures')}>Departures only</button>
-          <button className='btn' onClick={() => settype('arrivals')}>Arrivals only</button>
-          <br />
-          <div>
-            <button className='btn' onClick={() => backDay()}> - </button>
-            <button className='btn' onClick={() => setToday()}>{today}</button>
-            <button className='btn' onClick={() => addDay()}> + </button>
-          </div>
           <div className="table-responsive">
             {/* SHOW ALL FLIGHTS */}
             {displayType === 'all' &&
@@ -105,11 +88,11 @@ const DailyFlights = () => {
                     <th scope="col">Gate</th>
                     <th scope="col">Stand</th>
                     <th scope="col">Actual time</th>
-                    <th scope="col">Timer<br />Delay code</th>
+                    <th scope="col">Timer /<br />Delay code</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {sorted?.filter((f: any) => f.stdLocal.slice(0, 10) === today)?.map((f: any, i: number) =>
+                  {flights?.map((f: any, i: number) =>
                     <tr key={i} onClick={() => handleSelectFlight(f)}>
                       <td>{f.type}</td>
                       <td>{f.flightNum}</td>
@@ -126,9 +109,20 @@ const DailyFlights = () => {
                       <td>{f.gate === "TBA" ? "" : f.gate}</td>
                       <td>{f.stand}</td>
                       <td>{f.obTime}</td>
-                      <td>{f.obTime ? <>{f.delaycode}<br />{f.delaytime}</> :
-                        today === new Date().toISOString().slice(0, 10) &&
-                        <Timer deadline={f.stdLocal} />}</td>
+                      <td>
+                        {f.type === 'A' ?
+                          "N/A"
+                          :
+                          f.obTime
+                            ?
+                            <>
+                              {f.delaycode}<br />
+                              {f.delaytime}
+                            </>
+                            :
+                            <Timer deadline={f.stdLocal} />
+                        }
+                      </td>
                     </tr>)}
                 </tbody>
               </table>}
@@ -149,7 +143,7 @@ const DailyFlights = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {sorted.filter((f: any) => f.stdLocal.slice(0, 10) === today).filter((f: any) => f.type === 'A').map((f: any, i: number) =>
+                  {flights.filter((f: any) => f.type === 'A').map((f: any, i: number) =>
                     <tr key={i} onClick={() => handleSelectFlight(f)}>
                       <td>{f.type}</td>
                       <td>{f.flightNum}</td>
@@ -185,7 +179,7 @@ const DailyFlights = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {sorted.filter((f: any) => f.stdLocal.slice(0, 10) === today).filter((f: any) => f.type === 'D').map((f: any, i: number) =>
+                  {flights.filter((f: any) => f.type === 'D').map((f: any, i: number) =>
                     <tr key={i} onClick={() => handleSelectFlight(f)}>
                       <td>{f.type}</td>
                       <td>{f.flightNum}</td>

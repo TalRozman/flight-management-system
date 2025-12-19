@@ -1,12 +1,4 @@
-FROM selenium/standalone-chrome-debug
+FROM selenium/standalone-chrome:latest
 USER root
-
 WORKDIR /sel
-
-COPY entrypoint.sh /sel/
-
 EXPOSE 4444
-
-RUN chmod +x entrypoint.sh
-
-# ENTRYPOINT ["/sel/entrypoint.sh"]

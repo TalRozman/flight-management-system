@@ -131,7 +131,7 @@ def delPic(request,user):
     return Response(status=status.HTTP_202_ACCEPTED)
 
 @api_view(["GET"])
-def GetFlights(req):
+def PullFlights(req):
     res = getFlights()
     for i in res["flights"]:
         f = Flights(flightNum = i["flightNum"],dest = i["dest"],stdLocal=i["stdLocal"],type=i["type"],aircraftType=i["aircraftType"],aircraftReg=i["aircraftReg"],gate=i["gate"],pit=i["pit"])
@@ -139,19 +139,21 @@ def GetFlights(req):
     return Response(status=status.HTTP_200_OK)
 
 if (time.time() - 1672606800) % 86400 == 0:
-    GetFlights()
+    PullFlights()
 
 @permission_classes([IsAuthenticated])
-class MyFlightsView(APIView):
-    def get(self,request):
-        myModel = Flights.objects.all()
+@api_view(["GET"])
+def getFlightsByDate(request,date):
+        myModel = Flights.objects.filter(stdLocal__date=date)
         serailizer = FlightSerializer(myModel,many=True)
-        return Response(serailizer.data)      
+        return Response(serailizer.data)   
 
-    def patch(self, request, id):
-        my_model = Flights.objects.get(id=id)
-        serializer = UpdateFlightSerializer(my_model, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+@permission_classes([IsAuthenticated])
+@api_view(['PATCH'])
+def updateFlight(request, id):
+    my_model = Flights.objects.get(id=id)
+    serializer = UpdateFlightSerializer(my_model, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

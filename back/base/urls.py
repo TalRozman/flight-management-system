@@ -29,7 +29,7 @@ urlpatterns = [
     path('profile/delpicture/<user>',views.delPic),
     path('users/<id>',views.MyUsersView.as_view()),
     path('users/all/',views.getAllUsers),
-    path('flights/pull/',views.GetFlights),
-    path('flights/',views.MyFlightsView.as_view()),
-    path('flights/<id>',views.MyFlightsView.as_view()),
+    path('flights/pull/',views.PullFlights),
+    path('flights/get/<str:date>',views.getFlightsByDate),
+    path('flights/update/<id>',views.updateFlight),
 ]

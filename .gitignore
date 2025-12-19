@@ -4,6 +4,6 @@ back/myenv
 back/base/__pycache__
 back/base/migrations
 back/myproj/__pycache__
-back/myproj/env.py
+back/myproj/.env
 
 front/node_modules

@@ -18,8 +18,8 @@ const initialState: dailyState = {
 
 export const getFlightsAsync = createAsyncThunk(
   'daily/getAllFlights',
-  async (accessToken: string) => {
-    const response = await getAllFlights(accessToken);
+  async (data:{accessToken: string,date:string}) => {
+    const response = await getAllFlights(data.accessToken,data.date);
     return response;
   }
 );
@@ -54,7 +54,7 @@ export const dailySlice = createSlice(
     extraReducers: (builder) => {
       builder
         .addCase(getFlightsAsync.fulfilled, (state, action) => {
-          state.flights = action.payload
+          state.flights = action.payload.sort((a:Iflight, b:Iflight) => +new Date(a.stdLocal) - +new Date(b.stdLocal))
         })
         .addCase(getFlightsAsync.rejected, (state) => {
           timeout()

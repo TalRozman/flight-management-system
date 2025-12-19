@@ -20,7 +20,10 @@ const Navbar = () => {
                 // WHEN LOGGED IN!
                 <nav className="navbar navbar-expand-lg bg-body-tertiary sticky-top" style={{ backgroundColor: '#e3f2fd' }}>
                     <div className="container-fluid">
-                        <Link to={'/'}><img src="./aero.png" alt='logo' style={{ width: '100px' }} /></Link>
+                        <Link to={'/'} style={{color:'black',fontSize:'25px'}}>
+                        FMS
+                        {/* <img src="/icon.png" alt='logo' style={{ width: '100px' }} /> */}
+                        </Link>
                         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                             <span className="navbar-toggler-icon"></span>
                         </button>
@@ -55,7 +58,10 @@ const Navbar = () => {
                 :
                 // WHEN NOT LOGGED IN!
                 <nav className="navbar navbar-expand-lg bg-body-tertiary sticky-top" style={{ backgroundColor: 'black' }}>
-                    <Link to={'/'}><img src="./aero.png" alt='logo' style={{ width: '100px' }} /></Link>
+                    <Link to={'/'} style={{color:'black',fontSize:'25px'}}>
+                    FMS
+                    {/* <img src="/icon.png" alt='logo' style={{ width: '100px' }} /> */}
+                    </Link>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
                     </button>
