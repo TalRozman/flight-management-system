@@ -20,7 +20,6 @@ root.render(
       <Routes>
         <Route path='/' element={<App />}>
           <Route index element={<Landing/>} />
-          <Route path='resetPassword' element={<App />} />
           <Route path='profile' element={<Profile />} />
           <Route path='manageProfiles' element={<ProfileManage />} />
           <Route path='flights'>

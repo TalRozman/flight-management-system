@@ -26,9 +26,10 @@ const RegisterModal = () => {
     }
 
     const handleSuccess = () => {
-        emailJs("service_mur558c", "template_mxg7qpr", {
+        emailJs("service_1qd2ez8", "template_84uhpr6", {
             email: email,
-            firstname: first_name,
+            name: first_name,
+            link: `${window.location.origin}`
         }, 'y7dwm07pNohWq81rU');
         toast.success('User added successfully!', {
             position: "top-right",
