@@ -16,7 +16,7 @@ def getFlights():
     tomorrow_date = (datetime.now() + timedelta(days=1)).isoformat()[:10]
     try:
         # driver = webdriver.Remote(command_executor='http://127.0.0.1:4444',options=options)
-        driver = webdriver.Remote(command_executor='https://finalproj-aerohandling-scrapper.onrender.com',options=options)
+        driver = webdriver.Remote(command_executor='https://flight-management-system-scrapper.onrender.com',options=options)
     except:
         print("connection failed")
 
