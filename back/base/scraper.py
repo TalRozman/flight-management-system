@@ -1,4 +1,4 @@
-from datetime import datetime,timezone
+from datetime import datetime,timedelta
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.options import Options
@@ -13,19 +13,15 @@ def getFlights():
     options = webdriver.ChromeOptions()
     options.add_argument('--ignore-ssl-errors=yes')
     options.add_argument('--ignore-certificate-errors')
+    tomorrow_date = (datetime.now() + timedelta(days=1)).isoformat()[:10]
     try:
+        # driver = webdriver.Remote(command_executor='http://127.0.0.1:4444',options=options)
         driver = webdriver.Remote(command_executor='https://finalproj-aerohandling-scrapper.onrender.com',options=options)
     except:
         print("connection failed")
 
     driver.get(newUrl)
-    arvlDiv = driver.find_element(by=By.ID,value='tab_container_0') #ARRIVALS
-    datesList = arvlDiv.find_elements(by=By.CLASS_NAME, value='flight_table_date_row')
-    tomorrow = datesList[2]
-    date = tomorrow.find_element(by=By.TAG_NAME,value='th').text
-
     flightsList = driver.page_source
-
     driver.quit()    
 
     aeroCompanies = ["UX","IB","AI","B2","WZ","QS","EY","5F","3F","J2","HY","CY","A9","ET","FB","VY","FX","I2","XZ"]
@@ -35,7 +31,7 @@ def getFlights():
         fltListSoup = BeautifulSoup(flightsList,features="html.parser")
         
         arrivalFlightsDiv = fltListSoup.find(id="tab_container_0") #ARRIVALS
-        arvlFlts = arrivalFlightsDiv.findAll(attrs={"class": f"date_{date}"})
+        arvlFlts = arrivalFlightsDiv.findAll(attrs={"class": f"date_{tomorrow_date}"})
         counter = 0
         for flightRow in arvlFlts:
             details = flightRow.findAll('td')
@@ -43,7 +39,7 @@ def getFlights():
                 number = details[1].getText()
                 dest = details[2].getText()
                 time = details[3].getText()
-                fTime = datetime(year=int(date[:4]),month=int(date[5:7]),day=int(date[8:]),hour=int(time[:2]),minute=int(time[3:]))
+                fTime = datetime(year=int(tomorrow_date[:4]),month=int(tomorrow_date[5:7]),day=int(tomorrow_date[8:]),hour=int(time[:2]),minute=int(time[3:]))
                 for i in flights["flights"]:
                     if i["flightNum"] == number:
                         counter += 1
@@ -52,7 +48,7 @@ def getFlights():
 
 
         deptFlightsDiv = fltListSoup.find(id="tab_container_1") #DEPARTURES
-        deptFlts = deptFlightsDiv.findAll(attrs={"class": f"date_{date}"})
+        deptFlts = deptFlightsDiv.findAll(attrs={"class": f"date_{tomorrow_date}"})
         counter = 0
         for flightRow in deptFlts:
             items = flightRow.findAll('td')
@@ -60,7 +56,7 @@ def getFlights():
                 number = items[1].getText()
                 dest = items[2].getText()
                 time = items[3].getText()
-                fTime = datetime(year=int(date[:4]),month=int(date[5:7]),day=int(date[8:]),hour=int(time[:2]),minute=int(time[3:]))
+                fTime = datetime(year=int(tomorrow_date[:4]),month=int(tomorrow_date[5:7]),day=int(tomorrow_date[8:]),hour=int(time[:2]),minute=int(time[3:]))
                 for i in flights["flights"]:
                     if i["flightNum"] == number:
                         counter += 1
@@ -68,4 +64,5 @@ def getFlights():
                     flights["flights"].append({"flightNum":number,"dest":dest,"stdLocal":f"{fTime.year}-{fTime.month}-{fTime.day}T{fTime.timetz()}.000000+02:00","type":"D","aircraftType":"TBA","aircraftReg":"TBA","gate":"TBA","pit":"TBA"})
     except:
         print("bs failed")
+    # print(flights)
     return flights
