@@ -8,21 +8,41 @@ from bs4 import BeautifulSoup
 newUrl = 'https://www.flightstatus.co.il/'
 
 def getFlights():
-    # create a new Edge session
+    tomorrow_date = (datetime.now() + timedelta(days=1)).isoformat()[:10]
+
     options = Options()
     options = webdriver.ChromeOptions()
     options.add_argument('--ignore-ssl-errors=yes')
     options.add_argument('--ignore-certificate-errors')
-    tomorrow_date = (datetime.now() + timedelta(days=1)).isoformat()[:10]
-    try:
-        # driver = webdriver.Remote(command_executor='http://127.0.0.1:4444',options=options)
-        driver = webdriver.Remote(command_executor='https://flight-management-system-scrapper.onrender.com',options=options)
-    except:
-        print("connection failed")
 
-    driver.get(newUrl)
-    flightsList = driver.page_source
-    driver.quit()    
+    # The URL of your remote webdriver
+    executor_url = 'https://flight-management-system-scrapper.onrender.com'
+
+    driver = None
+
+    max_retries = 12
+    for i in range(max_retries):
+        try:
+            print(f"Attempting to connect (Try {i+1}/{max_retries})...")
+            driver = webdriver.Remote(
+                command_executor=executor_url,
+                options=options
+            )
+            print("Success! Connected to the driver.")
+            break
+        except Exception as e:
+            print(f"Connection failed: {e}")
+            print("Service might be sleeping. Waiting 10 seconds...")
+            time.sleep(10)
+
+    if driver:
+        driver.get(newUrl)
+        flightsList = driver.page_source
+        driver.quit()
+
+    else:
+        print("Could not connect after multiple attempts.")
+
 
     aeroCompanies = ["UX","IB","AI","B2","WZ","QS","EY","5F","3F","J2","HY","CY","A9","ET","FB","VY","FX","I2","XZ"]
     flights = {"flights":[]}
