@@ -3,6 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.options import Options
 from bs4 import BeautifulSoup
+import time
 
 #launch url
 newUrl = 'https://www.flightstatus.co.il/'
@@ -17,6 +18,7 @@ def getFlights():
 
     # The URL of your remote webdriver
     executor_url = 'https://flight-management-system-scrapper.onrender.com'
+    # executor_url = 'http://172.0.0.1:4444'
 
     driver = None
 
@@ -28,19 +30,17 @@ def getFlights():
                 command_executor=executor_url,
                 options=options
             )
-            print("Success! Connected to the driver.")
+            driver.get(newUrl)
+            flightsList = driver.page_source
+            driver.quit()
+            print("Success!")
             break
         except Exception as e:
             print(f"Connection failed: {e}")
             print("Service might be sleeping. Waiting 10 seconds...")
             time.sleep(10)
 
-    if driver:
-        driver.get(newUrl)
-        flightsList = driver.page_source
-        driver.quit()
-
-    else:
+    if driver == None:
         print("Could not connect after multiple attempts.")
 
 
