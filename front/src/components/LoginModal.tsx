@@ -13,20 +13,26 @@ const LoginModal = () => {
     const [email, setemail] = useState("")
     const [password, setpassword] = useState("")
     const [remember, setremember] = useState(false)
+    const [hold, setHold] = useState(false)
+
     const dispatch = useAppDispatch()
     // login
-    const handleLogin = async (usr: Iuser) => {
-        await dispatch(loginAsync(usr));
+    const handleLogin = () => {
+        setHold(true)
+        const usr: Iuser = { username: email.toLowerCase(), password }
+        dispatch(loginAsync(usr)).unwrap().then(() => {
+            setHold(false)
+        });
         if (remember) {
             dispatch(rememberMe(true));
             dispatch(rememberAsync(String(sessionStorage.getItem("tmpToken"))))
         }
     }
     useEffect(() => {
-        if (logged){
+        if (logged) {
             dispatch(setLoginModal(false));
         }
-    }, [logged,dispatch])
+    }, [logged, dispatch])
     return (
         <div>
             <Modal open={modalView}>
@@ -35,20 +41,28 @@ const LoginModal = () => {
                         <CloseOutlined />
                     </button>
                     <br />
-                    <label>
-                        E-mail: {" "}
-                        <input type={'email'} onKeyUp={(e) => setemail(e.currentTarget.value)} style={{ textTransform: 'none', textAlign: 'center' }} autoComplete="nono" />
-                    </label><br />
-                    <label>
-                        Password: {" "}
-                        <input type={'text'} className="psw" onKeyUp={(e) => setpassword(e.currentTarget.value)} style={{ textAlign: 'center', textTransform: 'none' }} autoComplete="nono" />
-                    </label><br />
-                    <label>
-                        Remember me?: {" "}
-                        <input type={'checkbox'} onClick={(e) => setremember(e.currentTarget.checked)} autoComplete="off" />
-                    </label><br /><br />
-                    <button className='btn btn-info' onClick={() => { const usr: Iuser = { username: email.toLowerCase(), password }; handleLogin(usr) }}>Log In</button>
-                    <br />{error}
+                    {hold === true ?
+                        <>
+                        <img src='/loader.gif' width={'10%'}/>
+                        </>
+                        :
+                        <>
+                            <label>
+                                E-mail: {" "}
+                                <input type={'email'} onKeyUp={(e) => setemail(e.currentTarget.value)} style={{ textTransform: 'none', textAlign: 'center' }} autoComplete="nono" />
+                            </label><br />
+                            <label>
+                                Password: {" "}
+                                <input type={'text'} className="psw" onKeyUp={(e) => setpassword(e.currentTarget.value)} style={{ textAlign: 'center', textTransform: 'none' }} autoComplete="nono" />
+                            </label><br />
+                            <label>
+                                Remember me?: {" "}
+                                <input type={'checkbox'} onClick={(e) => setremember(e.currentTarget.checked)} autoComplete="off" />
+                            </label><br /><br />
+                            <button className='btn btn-info' onClick={() => { handleLogin() }}>Log In</button>
+                            <br />{error}
+                        </>
+                    }
                 </Box>
             </Modal>
         </div>
